@@ -20,8 +20,7 @@ class TRAINER:
         self.optimizer = optimizer
         self.device = device
         self.criterion = criterion
-        self.task = task
-        
+        self.task
     #################
     # TRAINING STEP #
     #################
@@ -69,7 +68,7 @@ class TRAINER:
                 output = self.model(images)
                 loss = self.criterion(output, labels)
 
-                if self.task == "CL":
+                if self.task == "CLASSIFICATION":
                     output = output.argmax(axis=1)
                 output = output.cpu().detach().numpy()
                 labels = labels.cpu().detach().numpy()

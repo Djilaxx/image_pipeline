@@ -21,9 +21,8 @@ from utils import EARLY_STOPPING, FOLDING
 ##################
 # TRAIN FUNCTION #
 ##################
-def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18", task="CL"):
-    complete_name = f"{model_name}_{task}"
-    print(f"Training on task : {project} for {folds} folds with {complete_name} model")
+def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
+    print(f"Training on project : {project} for {folds} folds with {model_name} model")
     # CONFIG
     config = getattr(importlib.import_module(f"projects.{project}.config"), "config")
     # CREATING FOLDS
@@ -70,8 +69,7 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18", task="CL"):
             image_path=train_img,
             label=train_labels,
             resize=config.train.IMAGE_SIZE,
-            transforms=Augmentations["train"],
-            test=False
+            transforms=Augmentations["train"]
         )
         # TRAINING DATALOADER
         train_loader = torch.utils.data.DataLoader(
@@ -85,8 +83,7 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18", task="CL"):
             image_path=valid_img,
             label=valid_labels,
             resize=config.train.IMAGE_SIZE,
-            transforms=Augmentations["valid"],
-            test=False
+            transforms=Augmentations["valid"]        
         )
         # VALIDATION DATALOADER
         valid_loader = torch.utils.data.DataLoader(
@@ -105,7 +102,12 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18", task="CL"):
         # SET EARLY STOPPING FUNCTION
         es = EARLY_STOPPING.EarlyStopping(patience=2, mode="max")
         # CREATE TRAINER
-        trainer = TRAINER(model, optimizer, config.main.DEVICE, criterion, task)
+        trainer = TRAINER(model = model, 
+                        optimizer = optimizer, 
+                        device = config.main.DEVICE, 
+                        criterion = criterion, 
+                        task = config.main.TASK)
+
         # START TRAINING FOR N EPOCHS
         for epoch in range(config.train.EPOCHS):
             print(f"Starting epoch number : {epoch}")
@@ -133,7 +135,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--folds", type=int, default=5)
 parser.add_argument("--project", type=str, default="AERIAL_CACTUS")
 parser.add_argument("--model_name", type=str, default="RESNET18")
-parser.add_argument("--task", type=str, default="CL")
 
 args = parser.parse_args()
 ##################
@@ -144,6 +145,5 @@ if __name__ == "__main__":
     train(
         folds=args.folds,
         project=args.project,
-        model_name=args.model_name,
-        task=args.task
-    )
+        model_name=args.model_name    
+        )

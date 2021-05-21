@@ -12,13 +12,12 @@ class IMAGE_DATASET:
     transforms : if not None, transform will be applied on images
     '''
 
-    def __init__(self, image_path, resize=None, label=None, transforms=None, test=False):
+    def __init__(self, image_path, resize=None, label=None, transforms=None):
         self.image_path = image_path
         self.resize = resize
         self.label = label
         self.transforms = transforms
-        self.test = test
-    
+
     #RETURN THE LENGHT OF THE DATASET
     def __len__(self):
         return len(self.image_path)
@@ -37,7 +36,7 @@ class IMAGE_DATASET:
         if self.transforms:
             image = self.transforms(image)
 
-        if self.test is False:
+        if self.label is not None:
             label = self.label[item]
             return {"images": image, "labels": torch.tensor(label)}
         else:

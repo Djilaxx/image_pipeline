@@ -15,6 +15,7 @@ config.main.TRAIN_FILE = "data/melanoma/train_concat.csv"
 config.main.TEST_FILE = None
 config.main.FOLD_FILE = "data/melanoma/train_folds.csv"
 config.main.FOLD_METHOD = "SKF"
+config.main.TASK = "CLASSIFICATION"
 config.main.TARGET_VAR = "target"
 config.main.IMAGE_ID = "image_name"
 config.main.IMAGE_EXT = ".jpg"

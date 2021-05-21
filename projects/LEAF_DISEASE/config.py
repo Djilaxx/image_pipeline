@@ -15,6 +15,7 @@ config.main.TRAIN_FILE = "data/leaf_disease/train.csv"
 config.main.TEST_FILE = None
 config.main.FOLD_FILE = "data/leaf_disease/train_folds.csv"
 config.main.FOLD_METHOD = "SKF"
+config.main.TASK = "CLASSIFICATION"
 config.main.TARGET_VAR = "label"
 config.main.IMAGE_ID = "image_id"
 config.main.IMAGE_EXT = ".jpg"
