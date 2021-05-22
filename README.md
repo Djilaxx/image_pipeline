@@ -15,8 +15,8 @@ The projects folder contains the specific code about each project :
  * augment.py that contain the specific augmentations you want to perform on the images for training, validation and testing
 
 ### **What if i want to add a new project ?**
-To add a new task you'll to create a few things : 
-* a new folder in the task/ folder containing a \_\_init\_\_.py file, a config.py file and a augment.py file
+To add a new project you'll to create a few things : 
+* a new folder in the projects/ folder containing a \_\_init\_\_.py file, a config.py file and a augment.py file
 * copy and paste the content of another config.py file and change the information to be adequate with your task
 * Add the augment you require to the augment.py file
 
