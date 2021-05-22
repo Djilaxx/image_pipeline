@@ -20,7 +20,7 @@ class TRAINER:
         self.optimizer = optimizer
         self.device = device
         self.criterion = criterion
-        self.task
+        self.task = task
     #################
     # TRAINING STEP #
     #################

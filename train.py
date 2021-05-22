@@ -10,6 +10,7 @@ import os
 import inspect
 import importlib
 import argparse
+import datetime
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # ML IMPORT
 # MY OWN MODULES
@@ -122,7 +123,11 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
             print(f"Validation {config.train.METRIC} = {metric_value}")
             #SAVING CHECKPOINTS
             Path(os.path.join(config.main.PROJECT_PATH, "model_output/")).mkdir(parents=True, exist_ok=True)
-            es(metric_value, model, model_path=os.path.join(config.main.PROJECT_PATH, "model_output/", f"model_{fold}.bin"))
+            es(
+                metric_value, 
+                model, 
+                model_path=os.path.join(config.main.PROJECT_PATH, "model_output/", f"model_{model_name}_{fold}_{round(metric_value, 3)}_{str(datetime.date.today().isoformat())}.bin")
+            )
             if es.early_stop:
                 print("Early Stopping")
                 break
