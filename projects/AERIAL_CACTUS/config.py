@@ -21,6 +21,8 @@ config.main.IMAGE_ID = "id"
 config.main.IMAGE_EXT = ".jpg"
 config.main.DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 config.main.N_CLASS = 2
+config.main.PREDICTION_FOLD_NUMBER = 5
+config.main.WEIGHTS_PATH = "projects/AERIAL_CACTUS/model_output/FILE_NAME"
 #######################
 # TRAINING PARAMETERS #
 #######################
@@ -28,8 +30,8 @@ config.train = edict()
 config.train.IMAGE_SIZE = (32, 32)
 config.train.PRETRAINED = True
 config.train.EPOCHS = 1
-config.train.TRAIN_BS = 16
-config.train.VALID_BS = 8
+config.train.TRAIN_BS = 32
+config.train.VALID_BS = 16
 config.train.ES = 50
 config.train.LR = 1e-4
 config.train.LOSS = "CROSS_ENTROPY"

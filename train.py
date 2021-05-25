@@ -93,7 +93,6 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
             shuffle=True,
             num_workers=0
         )
-
         # IMPORT LOSS FUNCTION
         loss_function = getattr(importlib.import_module(f"loss.{config.train.LOSS}"), "loss_function")
         criterion = loss_function()
@@ -126,7 +125,7 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
             es(
                 metric_value, 
                 model, 
-                model_path=os.path.join(config.main.PROJECT_PATH, "model_output/", f"model_{model_name}_{fold}_{round(metric_value, 3)}_{str(datetime.date.today().isoformat())}.bin")
+                model_path=os.path.join(config.main.PROJECT_PATH, "model_output/", f"model_{model_name}_{round(metric_value, 3)}_{str(datetime.date.today().isoformat())}_{fold}.bin")
             )
             if es.early_stop:
                 print("Early Stopping")

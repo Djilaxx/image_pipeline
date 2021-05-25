@@ -22,13 +22,13 @@ To add a new project you'll to create a few things :
 
 To start training a model on any task use this command in terminal :
 ```
-python -m run --project=AERIAL_CACTUS
+python -m train --project=AERIAL_CACTUS
 ```
 You can replace the **AERIAL_CACTUS** with any folder in projects/.
 Default parameters train for **5** folds using a **RESNET18** model.
 You can change these parameters as such :
 ```
-python -m run --folds=8 --project=LEAF_DISEASE" --model_name=RESNET34
+python -m train --folds=8 --project=LEAF_DISEASE" --model_name=RESNET34
 ```
 
 The parameters can take different values :

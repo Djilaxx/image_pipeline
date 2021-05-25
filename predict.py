@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 import gc
 import os
+import glob
 import inspect
 import importlib
 import argparse
@@ -23,7 +24,13 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
     config = getattr(importlib.import_module(f"projects.{project}.config"), "config")
 
     # LOADING DATA FILE
-    df_test = pd.read_csv(config.main.TEST_FILE)
+    if config.main.TEST_FILE is not None:
+        df_test = pd.read_csv(config.main.TEST_FILE)
+    else:
+        image_path = []
+        for filename in glob.glob(os.path.join(config.MAIN.TEST_PATH, "*.jpg")):
+            image_path.append(filename)
+        df_test = pd.DataFrame({config.main.IMAGE_ID : image_path})
     #AUGMENTATIONS
     Augmentations = getattr(importlib.import_module(f"projects.{project}.augment"), "Augmentations")
     
@@ -33,9 +40,7 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
             model = cls(n_class=config.main.N_CLASS, pretrain=False)
 
     model.to(config.main.DEVICE)
-
-    # LOADING TRAINED WEIGHTS
-
+    
     ########################
     # CREATING DATALOADERS #
     ########################
@@ -60,23 +65,33 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
     )
     
     # PREDICTION LOOP
-    model_preds = []
-    for fold in range(number_of_fold):
+    final_preds = None
+    for fold in range(config.main.PREDICTION_FOLD_NUMBER):
+        model_preds = []
         # LOAD MODEL WITH FOLD WEIGHTS
+        weights = torch.load(config.main.WEIGHTS_PATH.rsplit("_", 1)[0] + "_" + str(fold) + ".bin")
+        model.load_state_dict(weights["model_state_dict"])
+        model.eval()
 
         with torch.no_grad():
             tk0 = tqdm(test_loader, total=len(test_loader))
             for _, data in enumerate(tk0):
                 # LOADING IMAGES
                 images = data["images"].to(config.main.DEVICE)
-
                 # PREDICT
-                output = model(images)
-                if config.main.TASK == "CLASSIFICATION":
-                    output = output.argmax(axis=1)
-                output = output.cpu().detach().numpy()
-                model_preds.append()
+                preds = model(images)
+                model_preds.extend(preds)
+            tk0.set_postfix(stage="test")
+        final_preds += model_preds
+    
+    final_preds /= config.main.PREDICTION_FOLD_NUMBER
+    if config.main.TASK == "CLASSIFICATION":
+        final_preds = final_preds.argmax(axis=1)
 
+    # CONDITIONAL SUBMISSION FILE DEPENDING IF WE HAVE A TEST FILE OR NOT
+    test_final_data = {config.main.IMAGE_ID : test_img, config.main.TARGET_VAR : final_preds}
+    test_df = pd.DataFrame(data=test_final_data)
+    test_df.to_csv(os.path.join(config.main.PROJECT_PATH, "preds.csv"))
 ##########
 # PARSER #
 ##########
