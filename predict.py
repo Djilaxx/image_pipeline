@@ -4,9 +4,8 @@
 # SYS IMPORT
 from tqdm import tqdm
 import torch
-from pathlib import Path
 import pandas as pd
-import gc
+import numpy as np
 import os
 import glob
 import inspect
@@ -28,7 +27,8 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
         df_test = pd.read_csv(config.main.TEST_FILE)
     else:
         image_path = []
-        for filename in glob.glob(os.path.join(config.MAIN.TEST_PATH, "*.jpg")):
+        for filename in glob.glob(os.path.join(config.main.TEST_PATH, "*.jpg")):
+            filename = filename.split("\\", -1)[-1]
             image_path.append(filename)
         df_test = pd.DataFrame({config.main.IMAGE_ID : image_path})
     #AUGMENTATIONS
@@ -46,33 +46,34 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
     ########################
     # TEST IDs & LABELS
     test_img = df_test[config.main.IMAGE_ID].values.tolist()
-    test_img = [os.path.join(config.main.TRAIN_PATH, os.path.splitext(i)[0] + config.main.IMAGE_EXT) for i in test_img]
+    test_img = [os.path.join(config.main.TEST_PATH, os.path.splitext(i)[0] + config.main.IMAGE_EXT) for i in test_img]
 
     # VALIDATION DATASET
     test_ds = IMAGE_DATASET(
         image_path=test_img,
         label=None,
         resize=config.train.IMAGE_SIZE,
-        transforms=Augmentations["test"],
-        test=True
+        transforms=Augmentations["test"]    
     )
     # VALIDATION DATALOADER
     test_loader = torch.utils.data.DataLoader(
         test_ds,
         batch_size=config.train.VALID_BS,
-        shuffle=True,
+        shuffle=False,
         num_workers=0
     )
     
     # PREDICTION LOOP
     final_preds = None
     for fold in range(config.main.PREDICTION_FOLD_NUMBER):
-        model_preds = []
+        print(f"Starting predictions for fold  : {fold}")
         # LOAD MODEL WITH FOLD WEIGHTS
         weights = torch.load(config.main.WEIGHTS_PATH.rsplit("_", 1)[0] + "_" + str(fold) + ".bin")
-        model.load_state_dict(weights["model_state_dict"])
+        model.load_state_dict(weights)
         model.eval()
 
+        model_preds = []
+        # DATA LOADER LOOP
         with torch.no_grad():
             tk0 = tqdm(test_loader, total=len(test_loader))
             for _, data in enumerate(tk0):
@@ -80,10 +81,22 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
                 images = data["images"].to(config.main.DEVICE)
                 # PREDICT
                 preds = model(images)
+                preds = preds.cpu().detach().numpy()
                 model_preds.extend(preds)
             tk0.set_postfix(stage="test")
-        final_preds += model_preds
-    
+        model_preds = np.vstack(model_preds)
+        model_preds = model_preds.reshape(len(df_test), 1, config.main.N_CLASS)
+        temp_preds = None
+        for p in model_preds:
+            if temp_preds is None:
+                temp_preds = p
+            else:
+                temp_preds = np.vstack((temp_preds, p))
+        if final_preds is None:
+            final_preds = temp_preds
+        else:
+            final_preds += temp_preds
+
     final_preds /= config.main.PREDICTION_FOLD_NUMBER
     if config.main.TASK == "CLASSIFICATION":
         final_preds = final_preds.argmax(axis=1)

@@ -12,7 +12,7 @@ config.main.PROJECT_PATH = "projects/AERIAL_CACTUS/"
 config.main.TRAIN_PATH = "data/aerial-cactus-identification/train/"
 config.main.TEST_PATH = "data/aerial-cactus-identification/test/"
 config.main.TRAIN_FILE = "data/aerial-cactus-identification/train.csv"
-config.main.TEST_FILE = None
+config.main.TEST_FILE = "data/aerial-cactus-identification/sample_submission.csv"
 config.main.FOLD_FILE = "data/aerial-cactus-identification/train_folds.csv"
 config.main.FOLD_METHOD = "SKF"
 config.main.TASK = "CLASSIFICATION"
@@ -22,7 +22,7 @@ config.main.IMAGE_EXT = ".jpg"
 config.main.DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 config.main.N_CLASS = 2
 config.main.PREDICTION_FOLD_NUMBER = 5
-config.main.WEIGHTS_PATH = "projects/AERIAL_CACTUS/model_output/FILE_NAME"
+config.main.WEIGHTS_PATH = "projects/AERIAL_CACTUS/model_output/model_RESNET18_2021-05-25_0.bin"
 #######################
 # TRAINING PARAMETERS #
 #######################
