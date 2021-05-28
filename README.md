@@ -30,7 +30,7 @@ You can replace the **AERIAL_CACTUS** with any folder in projects/.
 Default parameters train for **5** folds using a **RESNET18** model.
 You can change these parameters as such :
 ```
-python -m train --folds=8 --project=LEAF_DISEASE" --model_name=RESNET34
+python -m train --folds=8 --project=LEAF_DISEASE --model_name=RESNET34
 ```
 
 The parameters can take different values :
