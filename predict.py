@@ -48,14 +48,14 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
     test_img = df_test[config.main.IMAGE_ID].values.tolist()
     test_img = [os.path.join(config.main.TEST_PATH, os.path.splitext(i)[0] + config.main.IMAGE_EXT) for i in test_img]
 
-    # VALIDATION DATASET
+    # TEST DATASET
     test_ds = IMAGE_DATASET(
         image_path=test_img,
         label=None,
         resize=config.train.IMAGE_SIZE,
         transforms=Augmentations["test"]    
     )
-    # VALIDATION DATALOADER
+    # TEST DATALOADER
     test_loader = torch.utils.data.DataLoader(
         test_ds,
         batch_size=config.train.VALID_BS,
@@ -108,7 +108,7 @@ args = parser.parse_args()
 # START TRAINING #
 ##################
 if __name__ == "__main__":
-    print("Training start...")
+    print("Prediction start...")
     predict(
         project=args.project,
         model_name=args.model_name    
