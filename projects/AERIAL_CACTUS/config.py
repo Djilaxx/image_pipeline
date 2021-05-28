@@ -24,6 +24,7 @@ config.main.N_CLASS = 2
 config.main.PREDICTION_FOLD_NUMBER = 5
 config.main.WEIGHTS_PATH = "projects/AERIAL_CACTUS/model_output/model_RESNET18_2021-05-25_0.bin"
 config.main.PREDICT_PROBA = False
+
 #######################
 # TRAINING PARAMETERS #
 #######################
