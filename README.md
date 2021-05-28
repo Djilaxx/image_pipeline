@@ -48,7 +48,6 @@ You need to check the parameters config.main.PREDICTION_FOLD_NUMBER & config.mai
 
 ## **To do** 
 ---
-* Configure the inference file
 * Add code the allow for object_detection/image_segmentation projects
 * Add scheduler
 * Add more models
