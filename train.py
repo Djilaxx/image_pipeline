@@ -103,10 +103,10 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
         es = EARLY_STOPPING.EarlyStopping(patience=2, mode="max")
         # CREATE TRAINER
         trainer = TRAINER(model = model, 
+                        task=config.main.TASK,
+                        device = config.main.DEVICE,
                         optimizer = optimizer, 
-                        device = config.main.DEVICE, 
-                        criterion = criterion, 
-                        task = config.main.TASK)
+                        criterion = criterion) 
 
         # START TRAINING FOR N EPOCHS
         for epoch in range(config.train.EPOCHS):

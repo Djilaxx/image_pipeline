@@ -15,12 +15,12 @@ class TRAINER:
     trn_function train the model for one epoch
     eval_function evaluate the current model on validation data and output current loss and other evaluation metric
     '''
-    def __init__(self, model, optimizer, device, criterion, task):
+    def __init__(self, model, task, device, optimizer=None, criterion=None):
         self.model = model
-        self.optimizer = optimizer
-        self.device = device
-        self.criterion = criterion
         self.task = task
+        self.device = device
+        self.optimizer = optimizer
+        self.criterion = criterion
     #################
     # TRAINING STEP #
     #################
@@ -80,3 +80,23 @@ class TRAINER:
                 tk0.set_postfix(loss=losses.avg)
         print(f"Validation Loss = {losses.avg}")
         return loss, metrics_avg.avg
+
+    def test_step(self, data_loader, n_class):
+        # DATA LOADER LOOP
+        model_preds = []
+        with torch.no_grad():
+            tk0 = tqdm(data_loader, total=len(data_loader))
+            for _, data in enumerate(tk0):
+                # LOADING IMAGES
+                images = data["images"].to(self.device)
+                # PREDICT
+                preds = self.model(images)
+                if self.task == "CLASSIFICATION":
+                    if n_class == 2:
+                        preds = torch.sigmoid(preds)
+                    elif n_class > 2:
+                        preds = torch.softmax(preds, dim=0)
+                preds = preds.cpu().detach().numpy()
+                model_preds.extend(preds)
+            tk0.set_postfix(stage="test")
+        return model_preds

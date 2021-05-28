@@ -16,6 +16,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # ML IMPORT
 # MY OWN MODULES
 from datasets.IMAGE_DATASET import IMAGE_DATASET
+from trainer.TRAINER import TRAINER
 
 def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
     print(f"Predictions on project : {project} with {model_name} model")
@@ -40,7 +41,6 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
             model = cls(n_class=config.main.N_CLASS, pretrain=False)
 
     model.to(config.main.DEVICE)
-    
     ########################
     # CREATING DATALOADERS #
     ########################
@@ -72,22 +72,13 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
         model.load_state_dict(weights)
         model.eval()
 
-        model_preds = []
+        trainer = TRAINER(model=model, task=config.main.TASK, device=config.main.DEVICE, optimizer=None, criterion=None)
         # DATA LOADER LOOP
-        with torch.no_grad():
-            tk0 = tqdm(test_loader, total=len(test_loader))
-            for _, data in enumerate(tk0):
-                # LOADING IMAGES
-                images = data["images"].to(config.main.DEVICE)
-                # PREDICT
-                preds = model(images)
-                preds = preds.cpu().detach().numpy()
-                model_preds.extend(preds)
-            tk0.set_postfix(stage="test")
-        model_preds = np.vstack(model_preds)
-        model_preds = model_preds.reshape(len(df_test), 1, config.main.N_CLASS)
+        predictions = trainer.test_step(data_loader=test_loader, n_class=config.main.N_CLASS)
+        predictions = np.vstack(predictions)
+        predictions = predictions.reshape(len(df_test), 1, config.main.N_CLASS)
         temp_preds = None
-        for p in model_preds:
+        for p in predictions:
             if temp_preds is None:
                 temp_preds = p
             else:
@@ -98,13 +89,13 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
             final_preds += temp_preds
 
     final_preds /= config.main.PREDICTION_FOLD_NUMBER
-    if config.main.TASK == "CLASSIFICATION":
+    if config.main.PREDICT_PROBA is False:
         final_preds = final_preds.argmax(axis=1)
-
     # CONDITIONAL SUBMISSION FILE DEPENDING IF WE HAVE A TEST FILE OR NOT
-    test_final_data = {config.main.IMAGE_ID : test_img, config.main.TARGET_VAR : final_preds}
-    test_df = pd.DataFrame(data=test_final_data)
+    test_final_data = {config.main.IMAGE_ID : df_test[config.main.IMAGE_ID].values.tolist(), config.main.TARGET_VAR : final_preds}
+    test_df = pd.DataFrame(data=test_final_data, index=None)
     test_df.to_csv(os.path.join(config.main.PROJECT_PATH, "preds.csv"))
+
 ##########
 # PARSER #
 ##########
