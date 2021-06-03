@@ -18,7 +18,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from datasets.IMAGE_DATASET import IMAGE_DATASET
 from trainer.TRAINER import TRAINER
 
-def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
+def predict(run_number, project="AERIAL_CACTUS", model_name="RESNET18"):
     print(f"Predictions on project : {project} with {model_name} model")
     # CONFIG
     config = getattr(importlib.import_module(f"projects.{project}.config"), "config")
@@ -68,7 +68,7 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
     for fold in range(config.main.PREDICTION_FOLD_NUMBER):
         print(f"Starting predictions for fold  : {fold}")
         # LOAD MODEL WITH FOLD WEIGHTS
-        weights = torch.load(config.main.WEIGHTS_PATH.rsplit("_", 1)[0] + "_" + str(fold) + ".bin")
+        weights = torch.load(config.main.WEIGHTS_PATH.rsplit("_", 2)[0] + '_' + str(run_number) + "_" + str(fold) + ".bin")
         model.load_state_dict(weights)
         model.eval()
 
@@ -100,6 +100,7 @@ def predict(project="AERIAL_CACTUS", model_name="RESNET18"):
 # PARSER #
 ##########
 parser = argparse.ArgumentParser()
+parser.add_argument("--run_number", type=int)
 parser.add_argument("--project", type=str, default="AERIAL_CACTUS")
 parser.add_argument("--model_name", type=str, default="RESNET18")
 
@@ -110,6 +111,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     print("Prediction start...")
     predict(
+        run_number=args.run_number,
         project=args.project,
         model_name=args.model_name    
         )

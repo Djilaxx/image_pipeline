@@ -22,8 +22,8 @@ from utils import EARLY_STOPPING, FOLDING
 ##################
 # TRAIN FUNCTION #
 ##################
-def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
-    print(f"Training on project : {project} for {folds} folds with {model_name} model")
+def train(run_number, folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
+    print(f"Starting run number {run_number}, training on project : {project} for {folds} folds with {model_name} model")
     # CONFIG
     config = getattr(importlib.import_module(f"projects.{project}.config"), "config")
     # CREATING FOLDS
@@ -125,7 +125,7 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
             es(
                 metric_value, 
                 model, 
-                model_path=os.path.join(config.main.PROJECT_PATH, "model_output/", f"model_{model_name}_{str(datetime.date.today().isoformat())}_{fold}.bin")
+                model_path=os.path.join(config.main.PROJECT_PATH, "model_output/", f"model_{model_name}_{str(datetime.date.today().isoformat())}_{run_number}_{fold}.bin")
             )
             if es.early_stop:
                 print("Early Stopping")
@@ -136,6 +136,7 @@ def train(folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
 # PARSER #
 ##########
 parser = argparse.ArgumentParser()
+parser.add_argument("--run_number", type=int)
 parser.add_argument("--folds", type=int, default=5)
 parser.add_argument("--project", type=str, default="AERIAL_CACTUS")
 parser.add_argument("--model_name", type=str, default="RESNET18")
@@ -147,6 +148,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     print("Training start...")
     train(
+        run_number=args.run_number,
         folds=args.folds,
         project=args.project,
         model_name=args.model_name    
