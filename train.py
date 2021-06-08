@@ -11,6 +11,7 @@ import inspect
 import importlib
 import argparse
 import datetime
+import wandb
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # ML IMPORT
 # MY OWN MODULES
@@ -26,6 +27,9 @@ def train(run_number, folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
     print(f"Starting run number {run_number}, training on project : {project} for {folds} folds with {model_name} model")
     # CONFIG
     config = getattr(importlib.import_module(f"projects.{project}.config"), "config")
+
+    # INIT WANDB
+    wandb.init(config=config, project=project, name=model_name + "_" + str(run_number))
     # CREATING FOLDS
     FOLDING.create_folds(datapath=config.main.TRAIN_FILE,
                          output_path=config.main.FOLD_FILE,
@@ -106,8 +110,9 @@ def train(run_number, folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
                         task=config.main.TASK,
                         device = config.main.DEVICE,
                         optimizer = optimizer, 
-                        criterion = criterion) 
+                        criterion = criterion)
 
+        wandb.watch(model, criterion=criterion, idx=fold)
         # START TRAINING FOR N EPOCHS
         for epoch in range(config.train.EPOCHS):
             print(f"Starting epoch number : {epoch}")
@@ -120,6 +125,11 @@ def train(run_number, folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
             scheduler.step(val_loss)
             # METRICS
             print(f"Validation {config.train.METRIC} = {metric_value}")
+            
+            wandb.log({
+                    f"Validation Loss for fold {fold}" : val_loss, 
+                    f"Validation {metric_selected.__name__} for fold {fold}" : metric_value
+                })
             #SAVING CHECKPOINTS
             Path(os.path.join(config.main.PROJECT_PATH, "model_output/")).mkdir(parents=True, exist_ok=True)
             es(

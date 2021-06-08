@@ -117,3 +117,4 @@ dmypy.json
 model_init/
 model_output/
 data/
+wandb/
