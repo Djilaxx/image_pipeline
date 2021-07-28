@@ -21,6 +21,7 @@ config.main.IMAGE_ID = "image_id"
 config.main.IMAGE_EXT = ".jpg"
 config.main.DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 config.main.N_CLASS = 5
+config.main.SPLIT_SIZE = 0.2
 config.main.PREDICTION_FOLD_NUMBER = 5
 config.main.WEIGHTS_PATH = "projects/LEAF_DISEASE/model_output/model_RESNET18_2021-05-25_0.bin"
 config.main.PREDICT_PROBA = False
