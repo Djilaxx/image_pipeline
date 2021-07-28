@@ -142,6 +142,7 @@ def train(run_number, folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
                 break
             gc.collect()
 
+        # IF WE GO FOR A TRAIN - VALID SPLIT WE TRAIN ONE MODEL ONLY (folds=0 or 1)
         if folds < 2:
             break
 
