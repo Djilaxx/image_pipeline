@@ -12,8 +12,9 @@ warnings.filterwarnings("ignore")
 #################
 class TRAINER:
     '''
-    trn_function train the model for one epoch
-    eval_function evaluate the current model on validation data and output current loss and other evaluation metric
+    training_step train the model for one epoch
+    eval_step evaluate the current model on validation data and output current loss and other evaluation metric
+    test_step is used at inference time to predict on a new batch of data.
     '''
     def __init__(self, model, task, device, optimizer=None, criterion=None):
         self.model = model
@@ -21,6 +22,7 @@ class TRAINER:
         self.device = device
         self.optimizer = optimizer
         self.criterion = criterion
+
     #################
     # TRAINING STEP #
     #################

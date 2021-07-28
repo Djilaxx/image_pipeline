@@ -31,10 +31,10 @@ def train(run_number, folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
     # INIT WANDB
     wandb.init(config=config, project=project, name=model_name + "_" + str(run_number))
     # CREATING FOLDS
-    FOLDING.create_folds(datapath=config.main.TRAIN_FILE,
+    FOLDING.create_splits(input_path=config.main.TRAIN_FILE,
                          output_path=config.main.FOLD_FILE,
-                         nb_folds=folds,
-                         method=config.main.FOLD_METHOD,
+                         n_folds=folds,
+                         split_size=config.main.SPLIT_SIZE,
                          target=config.main.TARGET_VAR)
 
     # LOADING DATA FILE & TOKENIZER
@@ -45,11 +45,11 @@ def train(run_number, folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
     Augmentations = getattr(importlib.import_module(f"projects.{project}.augment"), "Augmentations")
 
     # FOLD LOOP
-    for fold in range(folds):
+    for fold in range(max(folds, 1)):
         print(f"Starting training for fold : {fold}")
         # CREATING TRAINING AND VALIDATION SETS
-        df_train = df[df.kfold != fold].reset_index(drop=True)
-        df_valid = df[df.kfold == fold].reset_index(drop=True)
+        df_train = df[df.split != fold].reset_index(drop=True)
+        df_valid = df[df.split == fold].reset_index(drop=True)
 
         # LOADING MODEL
         for name, cls in inspect.getmembers(importlib.import_module(f"models.{model_name}"), inspect.isclass):
@@ -141,6 +141,9 @@ def train(run_number, folds=5, project="AERIAL_CACTUS", model_name="RESNET18"):
                 print("Early Stopping")
                 break
             gc.collect()
+
+        if folds < 2:
+            break
 
 ##########
 # PARSER #
