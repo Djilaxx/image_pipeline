@@ -2,6 +2,7 @@
 # IMPORT MODULES #
 ##################
 import torch
+import numpy as np
 from tqdm import tqdm
 from utils.AVERAGE_METER import AverageMeter
 from utils.METRICS import metrics_dict
@@ -42,6 +43,7 @@ class TRAINER:
             # CALCULATE LOSS
             output = self.model(images)
             loss = self.criterion(output, labels)
+            loss = loss.to(torch.float32)
             # CALCULATE GRADIENTS
             loss.backward()
             self.optimizer.step()
@@ -75,6 +77,8 @@ class TRAINER:
                 output = output.cpu().detach().numpy()
                 labels = labels.cpu().detach().numpy()
                 metric_value = metric(labels, output)
+                if metric.__name__ == "mean_squared_error":
+                    metric_value = np.sqrt(metric_value)
 
                 losses.update(loss.item(), images.size(0))
                 metrics_avg.update(metric_value.item(), images.size(0))

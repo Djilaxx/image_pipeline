@@ -118,3 +118,7 @@ model_init/
 model_output/
 data/
 wandb/
+projects/BLINDNESS_DETECTION/
+projects/LEAF_DISEASE/
+projects/MELANOMA/
+projects/PETFINDER/
