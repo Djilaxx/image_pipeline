@@ -3,6 +3,16 @@ from torchvision import models
 
 
 class RESNEXT50_32X4D(nn.Module):
+    """
+    nn.Module of a resnext50_32x4d model
+
+    Parameters:
+    -----------
+    n_class: int
+        number of class in the dataset (1 for regression tasks)
+    pretrain: Boolean
+        using pretrained weights (on ImageNet) for finetuning or random weights (full training)
+    """
     def __init__(self, n_class=2, pretrain=True):
         super(RESNEXT50_32X4D, self).__init__()
 

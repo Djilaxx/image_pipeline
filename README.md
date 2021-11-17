@@ -24,35 +24,29 @@ To add a new project you'll to create a few things :
 
 To start training a model on any task use this command in terminal :
 ```
-python -m train --run_number=1 --project=AERIAL_CACTUS
+python -m train --project=AERIAL_CACTUS --run_note=test
 ```
 You can replace the **AERIAL_CACTUS** with any folder in projects/.
-Default parameters train for **5** folds using a **RESNET18** model.
+Default parameters train a **RESNET18** model.
 You can change these parameters as such :
 ```
-python -m train --run_number=1 --folds=8 --project=LEAF_DISEASE --model_name=RESNET34
+python -m train --project=LEAF_DISEASE --model_name=RESNET34 --run_note=test
 ```
 
 The parameters can take different values :
-*- **run_number** : int, allow you to track the number of training runs you did on a project
+*- **run_note** : str, allow you to add a title to your training runs
 * **project** : The project you want to train a model on, atm you can train a model on the aerial_cactus task, melanoma, blindness_detection & leaf_disease projects.
-* **folds** : this parameter determine the number of folds to create into the dataset. If you choose 5 for example, the dataset will be divided in 5, train a model on 4 folds and validate on the last (folds 0, 1, 2, and 3 for training and 4 for validation. Then, it'll train on folds 0, 1, 2, 4 and validate on 3 etc...).
 * **model_name** : You can choose any model that is in the models/ folder, name must be typed in MAJ like in the example above.
 
 ### **Inference**
 To start prediction on new data for a project you can use this :
 ```
-python -m predict --run_number=1 --project=AERIAL_CACTUS --model_name=RESNET18
+python -m predict --project=AERIAL_CACTUS --model_name=RESNET18 --run_note=test
 ```
-
-You need to check the parameters config.main.PREDICTION_FOLD_NUMBER & config.main.WEIGHTS_PATH, the 1st one must correspond to the number of fold you chose when training a model, the 2nd one must correspond to the path to the saved model weights (usually under projects/YOUR_PROJECT/model_output)
 
 ## **To do** 
 ---
-* Add code the allow for object_detection/image_segmentation projects
-* Add scheduler
 * Add more models
 * Add more loss functions available
-* Add metrics
-* Add logger
 * Add notebooks (for model evaluation - EDA - hyperparameter optimization etc...)
+* add support for meta features

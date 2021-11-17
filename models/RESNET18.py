@@ -3,6 +3,16 @@ import torch.nn as nn
 from torchvision import models
 
 class RESNET18(nn.Module):
+    """
+    nn.Module of a resnet18 model
+
+    Parameters:
+    -----------
+    n_class: int
+        number of class in the dataset (1 for regression tasks)
+    pretrain: Boolean
+        using pretrained weights (on ImageNet) for finetuning or random weights (full training)
+    """
     def __init__(self, n_class=2, pretrain=True):
         super(RESNET18, self).__init__()
 
